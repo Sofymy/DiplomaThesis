@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "38430401979",
+    "project_id": "diploma--thesis",
+    "storage_bucket": "diploma--thesis.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:38430401979:android:5b912a3293b6b486ba109e",
+        "android_client_info": {
+          "package_name": "bme.vik.diplomathesis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA-qvRXjymuugYR_KEklwGvHrfpYyZRkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
