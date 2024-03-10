@@ -1,4 +1,4 @@
-package bme.vik.diplomathesis.model.data
+package bme.vik.diplomathesis.model.data.callstate
 
 
 enum class CallState {

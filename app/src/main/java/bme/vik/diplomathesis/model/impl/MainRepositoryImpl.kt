@@ -3,16 +3,20 @@ package bme.vik.diplomathesis.model.impl
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import bme.vik.diplomathesis.model.data.CallStateHolder
+import android.util.Log
 import bme.vik.diplomathesis.model.data.KeyguardLocked
 import bme.vik.diplomathesis.model.data.MobileTrafficBytes
 import bme.vik.diplomathesis.model.data.RunningApplicationsHolder
+import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
 import bme.vik.diplomathesis.model.repository.AuthenticationRepository
 import bme.vik.diplomathesis.model.repository.MainRepository
 import bme.vik.diplomathesis.model.service.KeyguardLockedService
 import bme.vik.diplomathesis.model.service.MobileTrafficBytesService
 import bme.vik.diplomathesis.model.service.RunningApplicationsService
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 
@@ -22,15 +26,13 @@ class MainRepositoryImpl @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ): MainRepository {
 
-    //val runningApplications = MutableLiveData<RunningApplicationsHolder>()
-    //val mobileTrafficBytes = MutableLiveData<MobileTrafficBytes>()
-    //val keyguardLocked = MutableLiveData<KeyguardLocked>()
 
     override suspend fun signInAnonimously() {
         authenticationRepository.signInAnonymously(firebaseFirestore)
     }
 
-    override fun startService() {
+    override fun startService(
+    ) {
         val startIntentRunningApplications = Intent(applicationContext, RunningApplicationsService::class.java)
         val startIntentMobileTrafficBytes = Intent(applicationContext, MobileTrafficBytesService::class.java)
         val startKeyguardLockedService = Intent(applicationContext, KeyguardLockedService::class.java)
@@ -57,10 +59,33 @@ class MainRepositoryImpl @Inject constructor(
         applicationContext.stopService(stopKeyguardLockedService)
     }
 
+    override fun getRunningApplications(
+        onResult: (Throwable?) -> Unit
+    ): Flow<RunningApplicationsHolder> = callbackFlow {
+        val document = firebaseFirestore
+            .collection(RUNNING_APPLICATIONS_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+        val listener = document.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                val runningApplicationsHolderObject = snapshot.toObject(RunningApplicationsHolder::class.java)
+                if (runningApplicationsHolderObject != null) {
+                }
+            }
+        }
+        awaitClose {
+            listener.remove()
+            close()
+        }
+    }
+
     override fun saveRunningApplications(
         runningApplicationsHolder: RunningApplicationsHolder,
         onResult: (Throwable?) -> Unit
     ){
+        Log.d("tttt", runningApplicationsHolder.runningApplications.toString())
         firebaseFirestore
             .collection(RUNNING_APPLICATIONS_COLLECTION)
             .document(authenticationRepository.currentUserId)

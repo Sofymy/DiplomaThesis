@@ -64,9 +64,8 @@ class KeyguardLockedService(
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun getKeyguardLocked() {
         try {
-            val kg = this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-
-            val keyguardLocked = KeyguardLocked(kg.isKeyguardLocked)
+            val keyguardManager = this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+            val keyguardLocked = KeyguardLocked(keyguardManager.isKeyguardLocked)
 
             mainRepository.saveKeyguardLocked(keyguardLocked) {
 

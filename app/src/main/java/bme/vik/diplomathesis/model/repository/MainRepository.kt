@@ -1,9 +1,10 @@
 package bme.vik.diplomathesis.model.repository
 
-import bme.vik.diplomathesis.model.data.CallStateHolder
 import bme.vik.diplomathesis.model.data.KeyguardLocked
 import bme.vik.diplomathesis.model.data.MobileTrafficBytes
 import bme.vik.diplomathesis.model.data.RunningApplicationsHolder
+import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
+import kotlinx.coroutines.flow.Flow
 
 interface MainRepository {
     fun startService()
@@ -27,4 +28,6 @@ interface MainRepository {
         callStateHolder: CallStateHolder,
         onResult: (Throwable?) -> Unit
     )
+
+    fun getRunningApplications(onResult: (Throwable?) -> Unit): Flow<RunningApplicationsHolder>
 }

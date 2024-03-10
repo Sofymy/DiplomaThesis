@@ -1,5 +1,6 @@
-package bme.vik.diplomathesis.model.data
+package bme.vik.diplomathesis.model.data.callstate
 
+import bme.vik.diplomathesis.model.data.callstate.CallState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

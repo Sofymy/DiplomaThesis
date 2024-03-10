@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +32,9 @@ fun MainScreen(
     }
 }
 
-fun requestPermissions(context: Context, viewModel: MainViewModel) {
+fun requestPermissions(context: Context,
+                       viewModel: MainViewModel,
+) {
     if (context.let {
             ContextCompat.checkSelfPermission(
                 it,
@@ -51,8 +52,9 @@ fun requestPermissions(context: Context, viewModel: MainViewModel) {
             )
         } == PackageManager.PERMISSION_GRANTED
     ) {
-        Log.d("ttttt", "starts")
-        viewModel.startService()
+        viewModel.startService(
+
+        )
         return
     }
 
@@ -68,7 +70,6 @@ fun requestPermissions(context: Context, viewModel: MainViewModel) {
             Manifest.permission.PACKAGE_USAGE_STATS
         )
     ) {
-        Log.d("ttttt", "dialog")
         return
     }
 
@@ -82,7 +83,6 @@ fun requestPermissions(context: Context, viewModel: MainViewModel) {
         ),
         1
     )
-    Log.d("ttttt", "vege")
 
 }
 

@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager.EXTRA_STATE
-import bme.vik.diplomathesis.model.data.CallStateModel
+import bme.vik.diplomathesis.model.data.callstate.CallStateModel
 import bme.vik.diplomathesis.model.repository.MainRepository
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

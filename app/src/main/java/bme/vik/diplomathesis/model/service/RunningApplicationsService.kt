@@ -11,7 +11,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import bme.vik.diplomathesis.MainActivity
@@ -96,7 +95,6 @@ class RunningApplicationsService: Service() {
                             applicationName = it
                         )
                         handleRunningApplicationsHolder(runningApplication = runningApplication)
-                        Log.d("ttttttt", runningApplicationsHolder.runningApplications.toString())
                         mainRepository.saveRunningApplications(runningApplicationsHolder) {
 
                         }
