@@ -1,18 +1,15 @@
 package bme.vik.diplomathesis
 
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import bme.vik.diplomathesis.ui.screen.MainScreen
 import bme.vik.diplomathesis.ui.theme.DiplomaThesisTheme
+import bme.vik.diplomathesis.utils.PowerConnectionReceiver
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -23,5 +20,16 @@ class MainActivity : ComponentActivity() {
                 MainScreen()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val receiver = PowerConnectionReceiver ()
+        val ifilter = IntentFilter()
+        ifilter.addAction(Intent.ACTION_BATTERY_CHANGED)
+        ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
+        ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+        registerReceiver(receiver, ifilter)
     }
 }

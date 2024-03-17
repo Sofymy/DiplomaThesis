@@ -3,9 +3,9 @@ package bme.vik.diplomathesis.model.impl
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import bme.vik.diplomathesis.model.data.KeyguardLocked
 import bme.vik.diplomathesis.model.data.MobileTrafficBytes
+import bme.vik.diplomathesis.model.data.PowerConnection
 import bme.vik.diplomathesis.model.data.RunningApplicationsHolder
 import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
 import bme.vik.diplomathesis.model.repository.AuthenticationRepository
@@ -85,13 +85,14 @@ class MainRepositoryImpl @Inject constructor(
         runningApplicationsHolder: RunningApplicationsHolder,
         onResult: (Throwable?) -> Unit
     ){
-        Log.d("tttt", runningApplicationsHolder.runningApplications.toString())
+
         firebaseFirestore
             .collection(RUNNING_APPLICATIONS_COLLECTION)
             .document(authenticationRepository.currentUserId)
             .set(runningApplicationsHolder)
             .addOnCompleteListener {
-                onResult(it.exception)
+            }
+            .addOnFailureListener {
             }
     }
 
@@ -134,6 +135,19 @@ class MainRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun savePowerConnection(
+        powerConnection: PowerConnection,
+        onResult: (Throwable?) -> Unit,
+    ) {
+        firebaseFirestore
+            .collection(POWER_CONNECTION_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .set(powerConnection)
+            .addOnCompleteListener {
+                onResult(it.exception)
+            }
+    }
+
     override fun addListener() {
     }
 
@@ -146,6 +160,7 @@ class MainRepositoryImpl @Inject constructor(
         private const val MOBILE_TRAFFIC_BYTES_COLLECTION = "mobiletrafficbytes"
         private const val KEYGUARD_LOCKED_COLLECTION = "keyguardlocked"
         private const val CALL_STATE_COLLECTION = "callstate"
+        private const val POWER_CONNECTION_COLLECTION = "powerconnections"
     }
 
 }

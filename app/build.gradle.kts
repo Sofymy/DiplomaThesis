@@ -81,6 +81,9 @@ dependencies {
     //Gson
     implementation("com.google.code.gson:gson:2.10.1")
 
+    //Permission handling
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+
 
 }
 

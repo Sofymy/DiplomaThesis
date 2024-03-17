@@ -34,6 +34,8 @@ class KeyguardLockedService(
         createNotificationChannel()
         val notificationIntent = Intent(this, MainActivity::class.java)
 
+
+
         val pendingIntent: PendingIntent =
             Intent(this, MainActivity::class.java).let {
                 PendingIntent.getActivity(this, 0, notificationIntent,

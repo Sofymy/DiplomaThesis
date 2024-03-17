@@ -1,16 +1,21 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package bme.vik.diplomathesis.ui.screen
 
-import android.Manifest
-import android.app.Activity
+import android.Manifest.permission.PACKAGE_USAGE_STATS
+import android.Manifest.permission.READ_LOGS
+import android.Manifest.permission.READ_PHONE_STATE
 import android.content.Context
-import android.content.pm.PackageManager
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import bme.vik.diplomathesis.viewmodel.MainViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 
@@ -26,6 +31,35 @@ fun MainScreen(
     val context = LocalContext.current
     requestPermissions(context, viewModel)
 
+    val permissionStates = rememberMultiplePermissionsState(
+        listOf(
+            PACKAGE_USAGE_STATS,
+            READ_PHONE_STATE,
+            READ_LOGS
+        )
+    )
+
+    if (permissionStates.allPermissionsGranted) {
+        Text("All permission Granted")
+        viewModel.startService()
+    } else {
+        Column {
+            val textToShow = if (permissionStates.shouldShowRationale) {
+                "Please grant the permission."
+            } else {
+                "Camera permission required for this feature to be available. " +
+                        "Please grant the permission"
+            }
+            Text(textToShow)
+            Button(onClick = {
+                permissionStates.launchMultiplePermissionRequest()
+                viewModel.startService()
+            }) {
+                Text("Grant permissions")
+            }
+        }
+    }
+
     DisposableEffect(viewModel) {
         viewModel.addListener()
         onDispose { viewModel.removeListener() }
@@ -35,54 +69,9 @@ fun MainScreen(
 fun requestPermissions(context: Context,
                        viewModel: MainViewModel,
 ) {
-    if (context.let {
-            ContextCompat.checkSelfPermission(
-                it,
-                Manifest.permission.READ_PHONE_STATE
-            )
-        } == PackageManager.PERMISSION_GRANTED || context.let {
-            ContextCompat.checkSelfPermission(
-                it,
-                Manifest.permission.READ_LOGS
-            )
-        } == PackageManager.PERMISSION_GRANTED || context.let {
-            ContextCompat.checkSelfPermission(
-                it,
-                Manifest.permission.PACKAGE_USAGE_STATS
-            )
-        } == PackageManager.PERMISSION_GRANTED
-    ) {
-        viewModel.startService(
 
-        )
-        return
-    }
-
-    // 2. If if a permission rationale dialog should be shown
-    if (ActivityCompat.shouldShowRequestPermissionRationale(
-            context as Activity,
-            Manifest.permission.READ_PHONE_STATE
-        ) || ActivityCompat.shouldShowRequestPermissionRationale(
-            context,
-            Manifest.permission.READ_LOGS
-        ) || ActivityCompat.shouldShowRequestPermissionRationale(
-            context,
-            Manifest.permission.PACKAGE_USAGE_STATS
-        )
-    ) {
-        return
-    }
-
-    // 3. Otherwise, request permission
-    ActivityCompat.requestPermissions(
-        context,
-        arrayOf(
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.READ_LOGS,
-            Manifest.permission.PACKAGE_USAGE_STATS
-        ),
-        1
-    )
 
 }
+
+
 

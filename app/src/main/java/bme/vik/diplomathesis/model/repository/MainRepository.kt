@@ -2,6 +2,7 @@ package bme.vik.diplomathesis.model.repository
 
 import bme.vik.diplomathesis.model.data.KeyguardLocked
 import bme.vik.diplomathesis.model.data.MobileTrafficBytes
+import bme.vik.diplomathesis.model.data.PowerConnection
 import bme.vik.diplomathesis.model.data.RunningApplicationsHolder
 import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +27,10 @@ interface MainRepository {
     )
     fun saveCallState(
         callStateHolder: CallStateHolder,
+        onResult: (Throwable?) -> Unit
+    )
+    fun savePowerConnection(
+        powerConnection: PowerConnection,
         onResult: (Throwable?) -> Unit
     )
 
