@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Build
+import android.telephony.TelephonyManager
 import android.util.Log
 import bme.vik.diplomathesis.model.data.DeviceInfo
 import bme.vik.diplomathesis.model.data.Response
@@ -18,9 +19,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
+
 class AuthenticationRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ): AuthenticationRepository {
 
     override val currentUserId: String
@@ -66,10 +68,18 @@ class AuthenticationRepositoryImpl @Inject constructor(
             val deviceBrand = Build.MANUFACTURER
             val deviceName = Build.DEVICE
 
+            val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
+            val deviceTac = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                telephonyManager!!.typeAllocationCode
+            } else {
+                null
+            }
+
             val info = DeviceInfo(
                 deviceModel = deviceModel,
                 deviceBrand = deviceBrand,
-                deviceName = deviceName
+                deviceName = deviceName,
+                deviceTac = deviceTac
             )
 
             Response.Success(info)

@@ -1,7 +1,6 @@
 package bme.vik.diplomathesis.model.data.callstate
 
 import android.telephony.TelephonyManager
-import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -72,9 +71,7 @@ class CallStateModel  {
 
     private fun outgoingCall(onStateChanged: (() -> Unit)? = null) {
         if (currentState.state != CallState.Idle) return
-        Log.d("rrrr", currentState.state.toString())
         changeState(CallState.OutgoingCall)
-        Log.d("rrrr", currentState.state.toString())
         onStateChanged?.invoke()
     }
 

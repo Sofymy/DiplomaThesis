@@ -11,6 +11,7 @@ import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
 import bme.vik.diplomathesis.model.repository.AuthenticationRepository
 import bme.vik.diplomathesis.model.repository.MainRepository
 import bme.vik.diplomathesis.model.service.KeyguardLockedService
+import bme.vik.diplomathesis.model.service.LocationService
 import bme.vik.diplomathesis.model.service.MobileTrafficBytesService
 import bme.vik.diplomathesis.model.service.RunningApplicationsService
 import com.google.firebase.firestore.FirebaseFirestore
@@ -36,16 +37,20 @@ class MainRepositoryImpl @Inject constructor(
         val startIntentRunningApplications = Intent(applicationContext, RunningApplicationsService::class.java)
         val startIntentMobileTrafficBytes = Intent(applicationContext, MobileTrafficBytesService::class.java)
         val startKeyguardLockedService = Intent(applicationContext, KeyguardLockedService::class.java)
+        val startLocationService = Intent(applicationContext, LocationService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             applicationContext.startForegroundService(startIntentRunningApplications)
             applicationContext.startForegroundService(startIntentMobileTrafficBytes)
             applicationContext.startForegroundService(startKeyguardLockedService)
+            applicationContext.startForegroundService(startLocationService)
         }
         else {
             applicationContext.startService(startIntentRunningApplications)
             applicationContext.startService(startIntentMobileTrafficBytes)
             applicationContext.startService(startKeyguardLockedService)
+            applicationContext.startService(startLocationService)
+
         }
     }
 
@@ -53,10 +58,13 @@ class MainRepositoryImpl @Inject constructor(
         val stopIntentRunningApplications = Intent(applicationContext, RunningApplicationsService::class.java)
         val stopIntentMobileTrafficBytes = Intent(applicationContext, MobileTrafficBytesService::class.java)
         val stopKeyguardLockedService = Intent(applicationContext, KeyguardLockedService::class.java)
+        val stopLocationService = Intent(applicationContext, LocationService::class.java)
+
 
         applicationContext.stopService(stopIntentRunningApplications)
         applicationContext.stopService(stopIntentMobileTrafficBytes)
         applicationContext.stopService(stopKeyguardLockedService)
+        applicationContext.stopService(stopLocationService)
     }
 
     override fun getRunningApplications(

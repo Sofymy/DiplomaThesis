@@ -1,7 +1,9 @@
-@file:OptIn(ExperimentalPermissionsApi::class)
+@file:OptIn(ExperimentalPermissionsApi::class, ExperimentalPermissionsApi::class)
 
 package bme.vik.diplomathesis.ui.screen
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.PACKAGE_USAGE_STATS
 import android.Manifest.permission.READ_LOGS
 import android.Manifest.permission.READ_PHONE_STATE
@@ -35,7 +37,9 @@ fun MainScreen(
         listOf(
             PACKAGE_USAGE_STATS,
             READ_PHONE_STATE,
-            READ_LOGS
+            READ_LOGS,
+            ACCESS_COARSE_LOCATION,
+            ACCESS_FINE_LOCATION
         )
     )
 
