@@ -1,7 +1,9 @@
 package bme.vik.diplomathesis.model.repository
 
+import bme.vik.diplomathesis.model.data.Cell
 import bme.vik.diplomathesis.model.data.KeyguardLocked
 import bme.vik.diplomathesis.model.data.MobileTrafficBytes
+import bme.vik.diplomathesis.model.data.Network
 import bme.vik.diplomathesis.model.data.PowerConnection
 import bme.vik.diplomathesis.model.data.RunningApplicationsHolder
 import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
@@ -35,4 +37,13 @@ interface MainRepository {
     )
 
     fun getRunningApplications(onResult: (Throwable?) -> Unit): Flow<RunningApplicationsHolder>
+    fun saveNetwork(
+        network: Network,
+        onResult: (Throwable?) -> Unit
+    )
+
+    fun saveCell(
+        cell: Cell,
+        onResult: (Throwable?) -> Unit
+    )
 }

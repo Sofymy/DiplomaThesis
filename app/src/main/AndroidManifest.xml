@@ -17,6 +17,9 @@
     <!-- Required only when requesting background location access on
        Android 10 (API level 29) and higher. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PRECISE_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+
     <application
         android:name=".di.HiltApplication"
         android:allowBackup="true"
@@ -31,7 +34,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.DiplomaThesis">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -65,6 +67,7 @@
                 android:foregroundServiceType="location">
             <!-- Any inner elements would go here. -->
         </service>
+        <service android:name=".model.service.NetworkService" />
 
 
     </application>

@@ -31,5 +31,6 @@ class MainActivity : ComponentActivity() {
         ifilter.addAction(Intent.ACTION_POWER_CONNECTED)
         ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
         registerReceiver(receiver, ifilter)
+
     }
 }

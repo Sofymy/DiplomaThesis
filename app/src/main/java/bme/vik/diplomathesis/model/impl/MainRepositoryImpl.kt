@@ -3,8 +3,10 @@ package bme.vik.diplomathesis.model.impl
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import bme.vik.diplomathesis.model.data.Cell
 import bme.vik.diplomathesis.model.data.KeyguardLocked
 import bme.vik.diplomathesis.model.data.MobileTrafficBytes
+import bme.vik.diplomathesis.model.data.Network
 import bme.vik.diplomathesis.model.data.PowerConnection
 import bme.vik.diplomathesis.model.data.RunningApplicationsHolder
 import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
@@ -13,6 +15,7 @@ import bme.vik.diplomathesis.model.repository.MainRepository
 import bme.vik.diplomathesis.model.service.KeyguardLockedService
 import bme.vik.diplomathesis.model.service.LocationService
 import bme.vik.diplomathesis.model.service.MobileTrafficBytesService
+import bme.vik.diplomathesis.model.service.NetworkService
 import bme.vik.diplomathesis.model.service.RunningApplicationsService
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
@@ -38,19 +41,21 @@ class MainRepositoryImpl @Inject constructor(
         val startIntentMobileTrafficBytes = Intent(applicationContext, MobileTrafficBytesService::class.java)
         val startKeyguardLockedService = Intent(applicationContext, KeyguardLockedService::class.java)
         val startLocationService = Intent(applicationContext, LocationService::class.java)
+        val startCellService = Intent(applicationContext, NetworkService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             applicationContext.startForegroundService(startIntentRunningApplications)
             applicationContext.startForegroundService(startIntentMobileTrafficBytes)
             applicationContext.startForegroundService(startKeyguardLockedService)
             applicationContext.startForegroundService(startLocationService)
+            applicationContext.startForegroundService(startCellService)
         }
         else {
             applicationContext.startService(startIntentRunningApplications)
             applicationContext.startService(startIntentMobileTrafficBytes)
             applicationContext.startService(startKeyguardLockedService)
             applicationContext.startService(startLocationService)
-
+            applicationContext.startService(startCellService)
         }
     }
 
@@ -59,12 +64,14 @@ class MainRepositoryImpl @Inject constructor(
         val stopIntentMobileTrafficBytes = Intent(applicationContext, MobileTrafficBytesService::class.java)
         val stopKeyguardLockedService = Intent(applicationContext, KeyguardLockedService::class.java)
         val stopLocationService = Intent(applicationContext, LocationService::class.java)
+        val stopCellService = Intent(applicationContext, NetworkService::class.java)
 
 
         applicationContext.stopService(stopIntentRunningApplications)
         applicationContext.stopService(stopIntentMobileTrafficBytes)
         applicationContext.stopService(stopKeyguardLockedService)
         applicationContext.stopService(stopLocationService)
+        applicationContext.stopService(stopCellService)
     }
 
     override fun getRunningApplications(
@@ -130,6 +137,20 @@ class MainRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun saveNetwork(
+        network: Network,
+        onResult: (Throwable?) -> Unit
+    ) {
+        firebaseFirestore
+            .collection(NETWORK_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .set(network)
+            .addOnCompleteListener {
+                onResult(it.exception)
+            }
+    }
+
+
     override fun saveCallState(
         callStateHolder: CallStateHolder,
         onResult: (Throwable?) -> Unit) {
@@ -138,6 +159,19 @@ class MainRepositoryImpl @Inject constructor(
             .collection(CALL_STATE_COLLECTION)
             .document(authenticationRepository.currentUserId)
             .set(callStateHolder)
+            .addOnCompleteListener {
+                onResult(it.exception)
+            }
+    }
+
+    override fun saveCell(
+        cell: Cell,
+        onResult: (Throwable?) -> Unit) {
+
+        firebaseFirestore
+            .collection(CELL_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .set(cell)
             .addOnCompleteListener {
                 onResult(it.exception)
             }
@@ -168,6 +202,8 @@ class MainRepositoryImpl @Inject constructor(
         private const val MOBILE_TRAFFIC_BYTES_COLLECTION = "mobiletrafficbytes"
         private const val KEYGUARD_LOCKED_COLLECTION = "keyguardlocked"
         private const val CALL_STATE_COLLECTION = "callstate"
+        private const val NETWORK_COLLECTION = "networks"
+        private const val CELL_COLLECTION = "cells"
         private const val POWER_CONNECTION_COLLECTION = "powerconnections"
     }
 
