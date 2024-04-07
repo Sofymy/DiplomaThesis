@@ -5,12 +5,12 @@ package bme.vik.diplomathesis.ui.screen
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.PACKAGE_USAGE_STATS
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_LOGS
 import android.Manifest.permission.READ_PHONE_STATE
 import android.Manifest.permission.READ_PRECISE_PHONE_STATE
 import android.content.Context
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -25,7 +25,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
@@ -37,16 +36,30 @@ fun MainScreen(
     val context = LocalContext.current
     requestPermissions(context, viewModel)
 
-    val permissionStates = rememberMultiplePermissionsState(
-        listOf(
-            PACKAGE_USAGE_STATS,
-            READ_PHONE_STATE,
-            READ_LOGS,
-            ACCESS_COARSE_LOCATION,
-            READ_PRECISE_PHONE_STATE,
-            ACCESS_FINE_LOCATION
+    val permissionStates = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        rememberMultiplePermissionsState(
+            listOf(
+                PACKAGE_USAGE_STATS,
+                READ_PHONE_STATE,
+                READ_LOGS,
+                ACCESS_COARSE_LOCATION,
+                READ_PRECISE_PHONE_STATE,
+                ACCESS_FINE_LOCATION,
+                READ_EXTERNAL_STORAGE
+            )
         )
-    )
+    } else {
+        rememberMultiplePermissionsState(
+            listOf(
+                PACKAGE_USAGE_STATS,
+                READ_PHONE_STATE,
+                READ_LOGS,
+                ACCESS_COARSE_LOCATION,
+                ACCESS_FINE_LOCATION,
+                READ_EXTERNAL_STORAGE
+            )
+        )
+    }
 
     if (permissionStates.allPermissionsGranted) {
         Text("All permission Granted")

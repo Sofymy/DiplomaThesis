@@ -96,14 +96,17 @@ class NetworkService(
             val networkRoaming = telephonyManager.isNetworkRoaming
             val networkSpecifier = telephonyManager.networkSpecifier
 
-            val networkManualNetworkSelectionAllowed =                telephonyManager.isManualNetworkSelectionAllowed
+            val networkManualNetworkSelectionAllowed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                telephonyManager.isManualNetworkSelectionAllowed
+            } else {
+                null
+            }
 
             val networkSelectionMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 telephonyManager.networkSelectionMode
             } else {
                 null
             }
-
 
             val network = Network(
                 networkOperator,

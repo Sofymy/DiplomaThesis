@@ -5,18 +5,22 @@ import android.content.Intent
 import android.os.Build
 import bme.vik.diplomathesis.model.data.Cell
 import bme.vik.diplomathesis.model.data.KeyguardLocked
+import bme.vik.diplomathesis.model.data.MemoryUsage
 import bme.vik.diplomathesis.model.data.MobileTrafficBytes
 import bme.vik.diplomathesis.model.data.Network
 import bme.vik.diplomathesis.model.data.PowerConnection
 import bme.vik.diplomathesis.model.data.RunningApplicationsHolder
+import bme.vik.diplomathesis.model.data.StorageUsage
 import bme.vik.diplomathesis.model.data.callstate.CallStateHolder
 import bme.vik.diplomathesis.model.repository.AuthenticationRepository
 import bme.vik.diplomathesis.model.repository.MainRepository
 import bme.vik.diplomathesis.model.service.KeyguardLockedService
 import bme.vik.diplomathesis.model.service.LocationService
+import bme.vik.diplomathesis.model.service.MemoryUsageService
 import bme.vik.diplomathesis.model.service.MobileTrafficBytesService
 import bme.vik.diplomathesis.model.service.NetworkService
 import bme.vik.diplomathesis.model.service.RunningApplicationsService
+import bme.vik.diplomathesis.model.service.StorageUsageService
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +46,8 @@ class MainRepositoryImpl @Inject constructor(
         val startKeyguardLockedService = Intent(applicationContext, KeyguardLockedService::class.java)
         val startLocationService = Intent(applicationContext, LocationService::class.java)
         val startCellService = Intent(applicationContext, NetworkService::class.java)
+        val startMemoryUsageService = Intent(applicationContext, MemoryUsageService::class.java)
+        val startStorageUsageService = Intent(applicationContext, StorageUsageService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             applicationContext.startForegroundService(startIntentRunningApplications)
@@ -49,6 +55,8 @@ class MainRepositoryImpl @Inject constructor(
             applicationContext.startForegroundService(startKeyguardLockedService)
             applicationContext.startForegroundService(startLocationService)
             applicationContext.startForegroundService(startCellService)
+            applicationContext.startForegroundService(startMemoryUsageService)
+            applicationContext.startForegroundService(startStorageUsageService)
         }
         else {
             applicationContext.startService(startIntentRunningApplications)
@@ -56,6 +64,8 @@ class MainRepositoryImpl @Inject constructor(
             applicationContext.startService(startKeyguardLockedService)
             applicationContext.startService(startLocationService)
             applicationContext.startService(startCellService)
+            applicationContext.startService(startMemoryUsageService)
+            applicationContext.startService(startStorageUsageService)
         }
     }
 
@@ -65,6 +75,8 @@ class MainRepositoryImpl @Inject constructor(
         val stopKeyguardLockedService = Intent(applicationContext, KeyguardLockedService::class.java)
         val stopLocationService = Intent(applicationContext, LocationService::class.java)
         val stopCellService = Intent(applicationContext, NetworkService::class.java)
+        val stopMemoryUsageService = Intent(applicationContext, MemoryUsageService::class.java)
+        val stopStorageUsageService = Intent(applicationContext, StorageUsageService::class.java)
 
 
         applicationContext.stopService(stopIntentRunningApplications)
@@ -72,6 +84,8 @@ class MainRepositoryImpl @Inject constructor(
         applicationContext.stopService(stopKeyguardLockedService)
         applicationContext.stopService(stopLocationService)
         applicationContext.stopService(stopCellService)
+        applicationContext.stopService(stopMemoryUsageService)
+        applicationContext.stopService(stopStorageUsageService)
     }
 
     override fun getRunningApplications(
@@ -190,6 +204,32 @@ class MainRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun saveMemoryUsage(
+        memoryUsage: MemoryUsage,
+        onResult: (Throwable?) -> Unit,
+    ) {
+        firebaseFirestore
+            .collection(MEMORY_USAGE_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .set(memoryUsage)
+            .addOnCompleteListener {
+                onResult(it.exception)
+            }
+    }
+
+    override fun saveStorageUsage(
+        storageUsage: StorageUsage,
+        onResult: (Throwable?) -> Unit,
+    ) {
+        firebaseFirestore
+            .collection(STORAGE_USAGE_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .set(storageUsage)
+            .addOnCompleteListener {
+                onResult(it.exception)
+            }
+    }
+
     override fun addListener() {
     }
 
@@ -205,6 +245,8 @@ class MainRepositoryImpl @Inject constructor(
         private const val NETWORK_COLLECTION = "networks"
         private const val CELL_COLLECTION = "cells"
         private const val POWER_CONNECTION_COLLECTION = "powerconnections"
+        private const val MEMORY_USAGE_COLLECTION = "memoryusages"
+        private const val STORAGE_USAGE_COLLECTION = "storageusages"
     }
 
 }

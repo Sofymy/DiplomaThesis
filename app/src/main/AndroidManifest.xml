@@ -10,6 +10,7 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- Always include this permission -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -27,6 +28,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        tools:remove="android:appComponentFactory"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DiplomaThesis"
@@ -68,6 +70,8 @@
             <!-- Any inner elements would go here. -->
         </service>
         <service android:name=".model.service.NetworkService" />
+        <service android:name=".model.service.MemoryUsageService" />
+        <service android:name=".model.service.StorageUsageService" />
 
 
     </application>
