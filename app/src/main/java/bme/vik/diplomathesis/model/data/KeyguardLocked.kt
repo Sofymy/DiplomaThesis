@@ -7,5 +7,4 @@ import java.util.Locale
 
 data class KeyguardLocked(
     var keyguardLocked: Boolean = false,
-    var timeStamp: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(Date())
 ): Serializable

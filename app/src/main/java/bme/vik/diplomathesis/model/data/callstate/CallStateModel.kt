@@ -19,11 +19,9 @@ class CallStateModel  {
     fun phoneAction(newState: String){
         when(currentState.state){
             CallState.Idle -> {
-                //incoming call rings
                 if(newState == TelephonyManager.EXTRA_STATE_RINGING){
                     ring()
                 }
-                //outgoing call
                 else if(newState == TelephonyManager.EXTRA_STATE_OFFHOOK){
                     outgoingCall()
                 }

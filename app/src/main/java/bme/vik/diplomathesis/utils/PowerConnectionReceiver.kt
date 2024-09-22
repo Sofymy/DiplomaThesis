@@ -30,12 +30,7 @@ class PowerConnectionReceiver: BroadcastReceiver() {
             val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
                 context.registerReceiver(null, ifilter)
             }
-            val powerConnected = IntentFilter(Intent.ACTION_POWER_CONNECTED).let { ifilter ->
-                context.registerReceiver(null, ifilter)
-            }
-            val powerDisconnected: Intent? = IntentFilter(Intent.ACTION_POWER_DISCONNECTED).let { ifilter ->
-                context.registerReceiver(null, ifilter)
-            }
+
 
             val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
             val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING

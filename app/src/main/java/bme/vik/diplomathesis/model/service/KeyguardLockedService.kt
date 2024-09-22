@@ -63,7 +63,6 @@ class KeyguardLockedService(
         return null
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getKeyguardLocked() {
         try {
             val keyguardManager = this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager

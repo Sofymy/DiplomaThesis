@@ -38,7 +38,6 @@ interface MainRepository {
         onResult: (Throwable?) -> Unit
     )
 
-    fun getRunningApplications(onResult: (Throwable?) -> Unit): Flow<RunningApplicationsHolder>
     fun saveNetwork(
         network: Network,
         onResult: (Throwable?) -> Unit

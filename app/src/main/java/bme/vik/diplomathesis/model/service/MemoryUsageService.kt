@@ -75,13 +75,11 @@ class MemoryUsageService(
                 (allocatedMemory),
                 (freeHeapMemory),
             )
-            Log.d("eeeee", memoryUsage.toString())
             mainRepository.saveMemoryUsage(memoryUsage) {
 
             }
 
         } catch (e: Exception) {
-            Log.d("eeeeee", e.message.toString())
             e.printStackTrace()
         }
     }

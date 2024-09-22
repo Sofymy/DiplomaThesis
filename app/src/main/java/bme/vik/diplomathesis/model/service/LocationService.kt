@@ -52,7 +52,6 @@ class LocationService(
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
                 val location: Location? = locationResult.lastLocation
-                Log.d("eeeeee", location?.longitude.toString())
             }
         }
         if (ActivityCompat.checkSelfPermission(

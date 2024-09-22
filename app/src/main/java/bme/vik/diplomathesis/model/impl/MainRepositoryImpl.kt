@@ -22,9 +22,9 @@ import bme.vik.diplomathesis.model.service.NetworkService
 import bme.vik.diplomathesis.model.service.RunningApplicationsService
 import bme.vik.diplomathesis.model.service.StorageUsageService
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -34,6 +34,7 @@ class MainRepositoryImpl @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ): MainRepository {
 
+    fun getDate(): String =  SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(Date())
 
     override suspend fun signInAnonimously() {
         authenticationRepository.signInAnonymously(firebaseFirestore)
@@ -88,27 +89,6 @@ class MainRepositoryImpl @Inject constructor(
         applicationContext.stopService(stopStorageUsageService)
     }
 
-    override fun getRunningApplications(
-        onResult: (Throwable?) -> Unit
-    ): Flow<RunningApplicationsHolder> = callbackFlow {
-        val document = firebaseFirestore
-            .collection(RUNNING_APPLICATIONS_COLLECTION)
-            .document(authenticationRepository.currentUserId)
-        val listener = document.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                return@addSnapshotListener
-            }
-            if (snapshot != null) {
-                val runningApplicationsHolderObject = snapshot.toObject(RunningApplicationsHolder::class.java)
-                if (runningApplicationsHolderObject != null) {
-                }
-            }
-        }
-        awaitClose {
-            listener.remove()
-            close()
-        }
-    }
 
     override fun saveRunningApplications(
         runningApplicationsHolder: RunningApplicationsHolder,
@@ -117,6 +97,8 @@ class MainRepositoryImpl @Inject constructor(
 
         firebaseFirestore
             .collection(RUNNING_APPLICATIONS_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .collection(getDate())
             .document(authenticationRepository.currentUserId)
             .set(runningApplicationsHolder)
             .addOnCompleteListener {
@@ -132,6 +114,8 @@ class MainRepositoryImpl @Inject constructor(
         firebaseFirestore
             .collection(MOBILE_TRAFFIC_BYTES_COLLECTION)
             .document(authenticationRepository.currentUserId)
+            .collection(getDate())
+            .document(authenticationRepository.currentUserId)
             .set(mobileTrafficBytes)
             .addOnCompleteListener {
                 onResult(it.exception)
@@ -145,6 +129,8 @@ class MainRepositoryImpl @Inject constructor(
         firebaseFirestore
             .collection(KEYGUARD_LOCKED_COLLECTION)
             .document(authenticationRepository.currentUserId)
+            .collection(getDate())
+            .document(authenticationRepository.currentUserId)
             .set(keyguardLocked)
             .addOnCompleteListener {
                 onResult(it.exception)
@@ -157,6 +143,8 @@ class MainRepositoryImpl @Inject constructor(
     ) {
         firebaseFirestore
             .collection(NETWORK_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .collection(getDate())
             .document(authenticationRepository.currentUserId)
             .set(network)
             .addOnCompleteListener {
@@ -172,6 +160,8 @@ class MainRepositoryImpl @Inject constructor(
         firebaseFirestore
             .collection(CALL_STATE_COLLECTION)
             .document(authenticationRepository.currentUserId)
+            .collection(getDate())
+            .document(authenticationRepository.currentUserId)
             .set(callStateHolder)
             .addOnCompleteListener {
                 onResult(it.exception)
@@ -184,6 +174,8 @@ class MainRepositoryImpl @Inject constructor(
 
         firebaseFirestore
             .collection(CELL_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .collection(getDate())
             .document(authenticationRepository.currentUserId)
             .set(cell)
             .addOnCompleteListener {
@@ -198,6 +190,8 @@ class MainRepositoryImpl @Inject constructor(
         firebaseFirestore
             .collection(POWER_CONNECTION_COLLECTION)
             .document(authenticationRepository.currentUserId)
+            .collection(getDate())
+            .document(authenticationRepository.currentUserId)
             .set(powerConnection)
             .addOnCompleteListener {
                 onResult(it.exception)
@@ -211,6 +205,8 @@ class MainRepositoryImpl @Inject constructor(
         firebaseFirestore
             .collection(MEMORY_USAGE_COLLECTION)
             .document(authenticationRepository.currentUserId)
+            .collection(getDate())
+            .document(authenticationRepository.currentUserId)
             .set(memoryUsage)
             .addOnCompleteListener {
                 onResult(it.exception)
@@ -223,6 +219,8 @@ class MainRepositoryImpl @Inject constructor(
     ) {
         firebaseFirestore
             .collection(STORAGE_USAGE_COLLECTION)
+            .document(authenticationRepository.currentUserId)
+            .collection(getDate())
             .document(authenticationRepository.currentUserId)
             .set(storageUsage)
             .addOnCompleteListener {

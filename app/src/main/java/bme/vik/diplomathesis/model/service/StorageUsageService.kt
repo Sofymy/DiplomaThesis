@@ -76,7 +76,6 @@ class StorageUsageService(
 
             }
         } catch (e: Exception) {
-            Log.d("eeeeee", e.message.toString())
             e.printStackTrace()
         }
     }

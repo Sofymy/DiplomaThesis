@@ -43,11 +43,5 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getRunningApplications() {
-        repository.getRunningApplications(onResult = {})
-            .onEach {
-                _runningApplicationsHolder.value = it
-            }.launchIn(viewModelScope)
-    }
 
 }
