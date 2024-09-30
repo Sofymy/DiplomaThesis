@@ -5,9 +5,9 @@ import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import bme.vik.diplomathesis.ui.screen.MainScreen
+import bme.vik.diplomathesis.feature.main.MainScreen
 import bme.vik.diplomathesis.ui.theme.DiplomaThesisTheme
-import bme.vik.diplomathesis.utils.PowerConnectionReceiver
+import bme.vik.diplomathesis.domain.receiver.PowerConnectionReceiver
 import dagger.hilt.android.AndroidEntryPoint
 
 

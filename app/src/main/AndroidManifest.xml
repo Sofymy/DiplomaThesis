@@ -10,7 +10,8 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- Always include this permission -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -22,7 +23,7 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
-        android:name=".di.HiltApplication"
+        android:name=".DiplomaThesisApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -44,12 +45,12 @@
         </activity>
         <receiver
             android:exported="false"
-            android:name=".utils.CallStateReceiver">
+            android:name=".domain.receiver.CallStateReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".utils.PowerConnectionReceiver"
+        <receiver android:name=".domain.receiver.PowerConnectionReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_CHANGED"/>
@@ -59,19 +60,19 @@
                 <action android:name="android.intent.action.BATTERY_OKAY"/>
             </intent-filter>
         </receiver>
-        <service android:name=".model.service.RunningApplicationsService" />
-        <service android:name=".model.service.MobileTrafficBytesService" />
-        <service android:name=".model.service.KeyguardLockedService" />
+        <service android:name=".domain.service.RunningApplicationsService" />
+        <service android:name=".domain.service.MobileTrafficBytesService" />
+        <service android:name=".domain.service.KeyguardLockedService" />
         <!-- Recommended for Android 9 (API level 28) and lower. -->
         <!-- Required for Android 10 (API level 29) and higher. -->
         <service
-                android:name=".model.service.LocationService"
-                android:foregroundServiceType="location">
-            <!-- Any inner elements would go here. -->
+                android:name=".domain.service.LocationService"
+                android:foregroundServiceType="location"
+            tools:ignore="ForegroundServicePermission">
         </service>
-        <service android:name=".model.service.NetworkService" />
-        <service android:name=".model.service.MemoryUsageService" />
-        <service android:name=".model.service.StorageUsageService" />
+        <service android:name=".domain.service.NetworkService" />
+        <service android:name=".domain.service.MemoryUsageService" />
+        <service android:name=".domain.service.StorageUsageService" />
 
 
     </application>
