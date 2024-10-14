@@ -2,6 +2,7 @@ package bme.vik.diplomathesis.feature.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import bme.vik.diplomathesis.domain.model.logging.Logging
 import bme.vik.diplomathesis.domain.usecases.auth.AuthUseCases
 import bme.vik.diplomathesis.domain.usecases.main.MainUseCases
 import com.google.firebase.auth.FirebaseUser
@@ -13,13 +14,13 @@ import javax.inject.Inject
 
 data class MainUiState(
     val isLoading: Boolean = true,
-    val currentUser: FirebaseUser? = null
+    val currentUser: FirebaseUser? = null,
+    val logging: List<Logging> = emptyList()
 )
 
 sealed class MainUserEvent {
     data object CheckCurrentUser: MainUserEvent()
     data object SignInAnonymously: MainUserEvent()
-    data object StartServices: MainUserEvent()
 }
 
 @HiltViewModel
@@ -27,6 +28,10 @@ class MainViewModel @Inject constructor(
     private val authUseCases: AuthUseCases,
     private val mainUseCases: MainUseCases
 ): ViewModel() {
+
+    init {
+        listenToLoggingCollection()
+    }
 
     private val _state = MutableStateFlow(MainUiState())
     val state = _state
@@ -41,9 +46,6 @@ class MainViewModel @Inject constructor(
                 signInAnonymously()
             }
 
-            MainUserEvent.StartServices -> {
-                startServices()
-            }
         }
     }
 
@@ -54,14 +56,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
-    private fun startServices() {
-        mainUseCases.startServicesUseCase()
-    }
-
     private fun signInAnonymously(){
         viewModelScope.launch {
             authUseCases.signInAnonymouslyUseCase()
+        }
+    }
+
+    private fun listenToLoggingCollection() {
+        viewModelScope.launch {
+            mainUseCases.listenToLoggingCollection().collect { loggingList ->
+                _state.update {
+                    it.copy(logging = loggingList)
+                }
+            }
         }
     }
 }

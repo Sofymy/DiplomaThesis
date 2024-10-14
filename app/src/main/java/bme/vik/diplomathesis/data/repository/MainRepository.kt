@@ -9,10 +9,13 @@ import bme.vik.diplomathesis.domain.model.PowerConnectionInfo
 import bme.vik.diplomathesis.domain.model.running_applications.RunningApplicationsHolder
 import bme.vik.diplomathesis.domain.model.StorageUsageInfo
 import bme.vik.diplomathesis.domain.model.call_state.CallStateHolder
+import bme.vik.diplomathesis.domain.model.logging.DeviceMetric
+import bme.vik.diplomathesis.domain.model.logging.Logging
+import kotlinx.coroutines.flow.Flow
 
 interface MainRepository {
 
-    fun startServices()
+    fun startServices(loggingMetrics: List<DeviceMetric>)
     fun stopServices()
 
     suspend fun signInAnonymously()
@@ -57,4 +60,6 @@ interface MainRepository {
         storageUsageInfo: StorageUsageInfo,
         onResult: (Throwable?) -> Unit
     )
+
+    fun listenToLoggingCollection(): Flow<List<Logging>>
 }

@@ -48,7 +48,7 @@ fun MainScreen(
     PermissionHandler(
         permissionStates = permissionStates,
         onPermissionsGranted = {
-            viewModel.onEvent(MainUserEvent.StartServices)
+            //viewModel.onEvent(MainUserEvent.StartServices)
         }
     )
 }
