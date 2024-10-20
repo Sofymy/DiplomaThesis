@@ -1,17 +1,23 @@
 package bme.vik.diplomathesis.data.repository
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.telephony.TelephonyManager
+import android.util.Log
+import androidx.annotation.RequiresApi
 import bme.vik.diplomathesis.domain.model.*
 import bme.vik.diplomathesis.domain.model.call_state.CallStateHolder
 import bme.vik.diplomathesis.data.auth.AuthenticationService
 import bme.vik.diplomathesis.domain.model.logging.DeviceMetric
 import bme.vik.diplomathesis.domain.model.logging.Logging
 import bme.vik.diplomathesis.domain.model.running_applications.RunningApplicationsHolder
+import bme.vik.diplomathesis.domain.receiver.CallStateReceiver
+import bme.vik.diplomathesis.domain.receiver.PowerConnectionReceiver
+import bme.vik.diplomathesis.domain.service.CellService
 import bme.vik.diplomathesis.domain.service.KeyguardLockedService
-import bme.vik.diplomathesis.domain.service.LocationService
 import bme.vik.diplomathesis.domain.service.MemoryUsageService
 import bme.vik.diplomathesis.domain.service.MobileTrafficBytesService
 import bme.vik.diplomathesis.domain.service.NetworkService
@@ -39,6 +45,12 @@ class MainRepositoryImpl @Inject constructor(
         DeviceMetric.STORAGE_INFORMATION to StorageUsageService::class.java,
         DeviceMetric.MOBILE_NETWORK_DATA to NetworkService::class.java,
         DeviceMetric.DEVICE_INFORMATION to RunningApplicationsService::class.java,
+        DeviceMetric.CELL_INFORMATION to CellService::class.java
+    )
+
+    private val metricToBroadcastReceiverMap = mapOf(
+        DeviceMetric.BATTERY_DATA to PowerConnectionReceiver::class.java,
+        DeviceMetric.CALLS to CallStateReceiver::class.java
     )
 
     private fun getDate(): String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(Date())
@@ -56,31 +68,30 @@ class MainRepositoryImpl @Inject constructor(
             .mapValues { (_, metricsList) -> metricsList.flatten().distinct() }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun listenToLoggingCollection(): Flow<List<Logging>> = callbackFlow {
         val collectionRef = firebaseFirestore.collection("logging")
         val listenerRegistration = collectionRef.addSnapshotListener { snapshot, exception ->
-            if (exception != null) {
-                close(exception)
+            exception?.let {
+                close(it)
                 return@addSnapshotListener
             }
 
-            val loggingList = snapshot?.documents?.mapNotNull { document ->
-                document.toObject(Logging::class.java)
-            } ?: emptyList()
+            val loggingList = snapshot?.documents?.mapNotNull { it.toObject(Logging::class.java) } ?: emptyList()
             val groupedLogging = groupMetricsByTac(loggingList)
 
-            val telephonyManager = applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
-            val deviceTac = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                telephonyManager!!.typeAllocationCode
-            } else ""
+            val deviceTac = (applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager)
+                ?.takeIf { Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q }
+                ?.typeAllocationCode ?: ""
 
-            groupedLogging.forEach { logging ->
-                if (logging.key == deviceTac) {
-                    startServices(logging.value)
-                } else {
-                    stopServices()
-                }
-            }
+            val currentMetrics = groupedLogging[deviceTac] ?: emptyList()
+            Log.d("eeeeeeeeeeeee", currentMetrics.toString())
+
+            startServices(currentMetrics)
+            startBroadcastRecivers(currentMetrics)
+
+            stopServices(currentMetrics)
+            stopBroadcastReceivers(currentMetrics)
 
             trySend(loggingList)
         }
@@ -88,12 +99,59 @@ class MainRepositoryImpl @Inject constructor(
         awaitClose { listenerRegistration.remove() }
     }
 
+    override fun stopServices(loggingMetrics: List<DeviceMetric>) {
+        val metrics = metricToServiceMap.keys
+        val metricsToStop = metrics.filterNot { metric ->
+            loggingMetrics.contains(metric)
+        }
+
+        metricsToStop.forEach { metric ->
+            stopService(metricToServiceMap[metric]!!)
+        }
+    }
+
+
     override fun startServices(loggingMetrics: List<DeviceMetric>) {
+
         loggingMetrics.forEach { metric ->
             metricToServiceMap[metric]?.let { serviceClass ->
                 startService(serviceClass)
             }
         }
+    }
+
+    override fun startBroadcastRecivers(loggingMetrics: List<DeviceMetric>) {
+        loggingMetrics.forEach { metric ->
+            metricToBroadcastReceiverMap[metric]?.let { broadcastReceiverClass ->
+                startBroadcastReceiver(broadcastReceiverClass)
+            }
+        }
+    }
+
+    private fun startBroadcastReceiver(broadcastReceiverClass: Class<*>) {
+        val intent = Intent(applicationContext, broadcastReceiverClass)
+        applicationContext.sendBroadcast(intent)
+    }
+
+    private fun stopBroadcastReceivers(currentMetrics: List<DeviceMetric>) {
+        val activeMetrics = metricToBroadcastReceiverMap.keys
+        val metricsToStop = activeMetrics.filterNot { metric ->
+            currentMetrics.contains(metric)
+        }
+
+        metricsToStop.forEach { metric ->
+            stopBroadcastReceiver(metricToBroadcastReceiverMap[metric]!!)
+        }
+    }
+
+    private fun stopBroadcastReceiver(broadcastReceiverClass: Class<*>) {
+        val receiver = ComponentName(applicationContext, broadcastReceiverClass)
+
+        val packageManager = applicationContext.packageManager;
+
+        packageManager.setComponentEnabledSetting(receiver,
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            PackageManager.DONT_KILL_APP)
     }
 
     private fun startService(serviceClass: Class<*>) {
@@ -105,15 +163,18 @@ class MainRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun stopServices() {
-        metricToServiceMap.values.forEach { serviceClass ->
-            stopService(serviceClass)
+
+    private fun stopService(serviceClass: Class<*>) {
+        Log.d("ServiceStop", "Attempting to stop service: ${serviceClass.simpleName}")
+        val intent = Intent(applicationContext, serviceClass)
+        try {
+            val stopped = applicationContext.stopService(intent)
+            Log.d("ServiceStop", "Service stopped: $stopped")
+        } catch (e: Exception) {
+            Log.e("ServiceStopError", "Error stopping service: ${e.message}", e)
         }
     }
 
-    private fun stopService(serviceClass: Class<*>) {
-        applicationContext.stopService(Intent(applicationContext, serviceClass))
-    }
 
     override suspend fun saveRunningApplications(
         runningApplicationsHolder: RunningApplicationsHolder,

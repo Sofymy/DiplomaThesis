@@ -45,12 +45,14 @@
         </activity>
         <receiver
             android:exported="false"
+            android:enabled="false"
             android:name=".domain.receiver.CallStateReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".domain.receiver.PowerConnectionReceiver"
+            android:enabled="false"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_CHANGED"/>

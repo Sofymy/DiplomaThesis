@@ -81,4 +81,11 @@ class CellService : Service() {
         }
 
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ServiceUtils.stopTimer()
+        stopForeground(true)
+        stopSelf()
+    }
 }

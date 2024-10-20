@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.Flow
 interface MainRepository {
 
     fun startServices(loggingMetrics: List<DeviceMetric>)
-    fun stopServices()
+    fun stopServices(loggingMetrics: List<DeviceMetric>)
 
     suspend fun signInAnonymously()
 
@@ -62,4 +62,5 @@ interface MainRepository {
     )
 
     fun listenToLoggingCollection(): Flow<List<Logging>>
+    fun startBroadcastRecivers(loggingMetrics: List<DeviceMetric>)
 }

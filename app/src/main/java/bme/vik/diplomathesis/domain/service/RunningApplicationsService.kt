@@ -95,4 +95,13 @@ class RunningApplicationsService : Service() {
             .firstOrNull { it.packageName == packageName }
             ?.let { packageManager.getApplicationLabel(it).toString() }
     }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ServiceUtils.stopTimer()
+
+        stopForeground(true)
+        stopSelf()
+    }
 }

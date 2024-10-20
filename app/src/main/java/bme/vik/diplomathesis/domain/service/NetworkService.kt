@@ -77,4 +77,12 @@ class NetworkService : Service() {
             e.printStackTrace()
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ServiceUtils.stopTimer()
+
+        stopForeground(true)
+        stopSelf()
+    }
 }

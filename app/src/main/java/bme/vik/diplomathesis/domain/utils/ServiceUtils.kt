@@ -9,11 +9,13 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import bme.vik.diplomathesis.MainActivity
+import bme.vik.diplomathesis.R
 import java.util.Timer
 import kotlin.concurrent.timerTask
 
 object ServiceUtils {
     private const val CHANNEL_ID = "ForegroundService Kotlin"
+    private var timer: Timer? = Timer()
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -33,25 +35,33 @@ object ServiceUtils {
             service,
             0,
             notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification = NotificationCompat.Builder(service, CHANNEL_ID)
             .setContentTitle("Foreground RunningApplicationsService")
             .setContentText(input)
             .setContentIntent(pendingIntent)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .build()
 
         service.startForeground(1, notification)
     }
 
-    fun scheduleTask(interval: Long, task: () -> Unit): Timer {
-        val timer = Timer()
-        timer.schedule(
+    fun scheduleTask(interval: Long, task: () -> Unit): Timer? {
+        if (timer == null) {
+            timer = Timer()
+        }
+        timer?.schedule(
             timerTask { task() },
             interval,
             interval
         )
         return timer
+    }
+
+    fun stopTimer() {
+        timer?.cancel()
+        timer = null
     }
 }

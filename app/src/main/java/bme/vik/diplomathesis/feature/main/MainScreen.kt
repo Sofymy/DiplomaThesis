@@ -9,11 +9,15 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import bme.vik.diplomathesis.ui.common.HandleLifecycleEvents
@@ -45,12 +49,22 @@ fun MainScreen(
         permissions = getPermissionsList()
     )
 
-    PermissionHandler(
-        permissionStates = permissionStates,
-        onPermissionsGranted = {
-            //viewModel.onEvent(MainUserEvent.StartServices)
+    Column {
+        state.logging.forEach {
+            it.loggingMetrics.forEach { metric ->
+                Text(text = metric.title)
+            }
         }
-    )
+
+        Spacer(modifier = Modifier.height(100.dp))
+
+        PermissionHandler(
+            permissionStates = permissionStates,
+            onPermissionsGranted = {
+                //viewModel.onEvent(MainUserEvent.StartServices)
+            }
+        )
+    }
 }
 
 @Composable
