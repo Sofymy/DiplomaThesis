@@ -39,7 +39,7 @@ object ServiceUtils {
         )
 
         val notification = NotificationCompat.Builder(service, CHANNEL_ID)
-            .setContentTitle("Foreground RunningApplicationsService")
+            .setContentTitle("Your data is being collected by the app for monitoring purposes.")
             .setContentText(input)
             .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.ic_launcher_foreground)

@@ -43,39 +43,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver
-            android:exported="false"
-            android:enabled="false"
-            android:name=".domain.receiver.CallStateReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE"/>
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".domain.receiver.PowerConnectionReceiver"
-            android:enabled="false"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BATTERY_CHANGED"/>
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
-                <action android:name="android.intent.action.BATTERY_LOW"/>
-                <action android:name="android.intent.action.BATTERY_OKAY"/>
-            </intent-filter>
-        </receiver>
+
+        <service android:name=".domain.service.CellService"/>
         <service android:name=".domain.service.RunningApplicationsService" />
         <service android:name=".domain.service.MobileTrafficBytesService" />
         <service android:name=".domain.service.KeyguardLockedService" />
-        <!-- Recommended for Android 9 (API level 28) and lower. -->
-        <!-- Required for Android 10 (API level 29) and higher. -->
-        <service
-                android:name=".domain.service.LocationService"
-                android:foregroundServiceType="location"
-            tools:ignore="ForegroundServicePermission">
-        </service>
         <service android:name=".domain.service.NetworkService" />
         <service android:name=".domain.service.MemoryUsageService" />
         <service android:name=".domain.service.StorageUsageService" />
-
+        <service android:name=".domain.service.LoggingService"/>
 
     </application>
 

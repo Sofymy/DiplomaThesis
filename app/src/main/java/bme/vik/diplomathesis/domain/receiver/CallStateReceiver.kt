@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CallStateReceiver : HiltBroadcastReceiver() {
+class CallStateReceiver : BroadcastReceiver() {
 
     private val callModel = CallStateModel()
 
@@ -27,7 +27,6 @@ class CallStateReceiver : HiltBroadcastReceiver() {
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
         intent.extras?.getString(EXTRA_STATE)?.let { newState ->
             Toast.makeText(context, newState, Toast.LENGTH_LONG).show()
             callModel.phoneAction(newState)

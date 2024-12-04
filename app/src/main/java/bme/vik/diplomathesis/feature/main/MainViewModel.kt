@@ -64,7 +64,7 @@ class MainViewModel @Inject constructor(
 
     private fun listenToLoggingCollection() {
         viewModelScope.launch {
-            mainUseCases.listenToLoggingCollection().collect { loggingList ->
+            mainUseCases.listenToLoggingCollectionUseCase().collect { loggingList ->
                 _state.update {
                     it.copy(logging = loggingList)
                 }

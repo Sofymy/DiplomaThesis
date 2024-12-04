@@ -17,8 +17,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MemoryUsageService : Service() {
 
-    @Inject
-    lateinit var mainRepository: MainRepository
+    @Inject lateinit var mainRepository: MainRepository
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)

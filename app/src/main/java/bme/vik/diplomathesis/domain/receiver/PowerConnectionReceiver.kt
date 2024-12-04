@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PowerConnectionReceiver: HiltBroadcastReceiver() {
+class PowerConnectionReceiver: BroadcastReceiver() {
 
     @Inject
     lateinit var mainRepository: MainRepository
@@ -29,7 +29,6 @@ class PowerConnectionReceiver: HiltBroadcastReceiver() {
         context: Context,
         intent: Intent,
     ) {
-        super.onReceive(context, intent)
         try{
             val bundle = intent.extras!!
             val newState = bundle.getString(TelephonyManager.EXTRA_STATE)

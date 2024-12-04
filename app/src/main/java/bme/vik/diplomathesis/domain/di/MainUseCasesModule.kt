@@ -1,7 +1,7 @@
 package bme.vik.diplomathesis.domain.di
 
 import bme.vik.diplomathesis.data.repository.MainRepository
-import bme.vik.diplomathesis.domain.usecases.main.ListenToLoggingCollection
+import bme.vik.diplomathesis.domain.usecases.main.ListenToLoggingCollectionUseCase
 import bme.vik.diplomathesis.domain.usecases.main.MainUseCases
 import dagger.Module
 import dagger.Provides
@@ -17,11 +17,11 @@ object MainUseCasesModule {
     @Singleton
     fun provideMainUseCases(
         repository: MainRepository,
-        listenToLoggingCollection: ListenToLoggingCollection
+        listenToLoggingCollectionUseCase: ListenToLoggingCollectionUseCase
     ): MainUseCases {
         return MainUseCases(
             repository = repository,
-            listenToLoggingCollection = listenToLoggingCollection
+            listenToLoggingCollectionUseCase = listenToLoggingCollectionUseCase
         )
     }
 
@@ -29,8 +29,8 @@ object MainUseCasesModule {
     @Singleton
     fun provideListenToLoggingCollectionUseCase(
         repository: MainRepository
-    ): ListenToLoggingCollection {
-        return ListenToLoggingCollection(repository)
+    ): ListenToLoggingCollectionUseCase {
+        return ListenToLoggingCollectionUseCase(repository)
     }
 
 

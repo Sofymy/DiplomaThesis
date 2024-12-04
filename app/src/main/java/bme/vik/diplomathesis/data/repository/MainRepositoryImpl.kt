@@ -1,8 +1,11 @@
 package bme.vik.diplomathesis.data.repository
 
+import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.telephony.TelephonyManager
@@ -53,6 +56,23 @@ class MainRepositoryImpl @Inject constructor(
         DeviceMetric.CALLS to CallStateReceiver::class.java
     )
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun registerReceiverForMetric(metric: DeviceMetric) {
+        val receiverClass = metricToBroadcastReceiverMap[metric]
+
+        receiverClass?.let {
+            val receiver = it.newInstance() as BroadcastReceiver
+            val intentFilter = when (metric) {
+                DeviceMetric.BATTERY_DATA -> IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+                DeviceMetric.CALLS -> IntentFilter("android.intent.action.PHONE_STATE")
+                else -> IntentFilter()
+            }
+
+            applicationContext.registerReceiver(receiver, intentFilter)
+        }
+    }
+
     private fun getDate(): String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(Date())
 
     override suspend fun signInAnonymously() {
@@ -85,7 +105,6 @@ class MainRepositoryImpl @Inject constructor(
                 ?.typeAllocationCode ?: ""
 
             val currentMetrics = groupedLogging[deviceTac] ?: emptyList()
-            Log.d("eeeeeeeeeeeee", currentMetrics.toString())
 
             startServices(currentMetrics)
             startBroadcastRecivers(currentMetrics)
@@ -122,15 +141,10 @@ class MainRepositoryImpl @Inject constructor(
 
     override fun startBroadcastRecivers(loggingMetrics: List<DeviceMetric>) {
         loggingMetrics.forEach { metric ->
-            metricToBroadcastReceiverMap[metric]?.let { broadcastReceiverClass ->
-                startBroadcastReceiver(broadcastReceiverClass)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                registerReceiverForMetric(metric)
             }
         }
-    }
-
-    private fun startBroadcastReceiver(broadcastReceiverClass: Class<*>) {
-        val intent = Intent(applicationContext, broadcastReceiverClass)
-        applicationContext.sendBroadcast(intent)
     }
 
     private fun stopBroadcastReceivers(currentMetrics: List<DeviceMetric>) {
@@ -140,18 +154,18 @@ class MainRepositoryImpl @Inject constructor(
         }
 
         metricsToStop.forEach { metric ->
-            stopBroadcastReceiver(metricToBroadcastReceiverMap[metric]!!)
+            val receiverClass = metricToBroadcastReceiverMap[metric]
+            val receiver = receiverClass?.newInstance() as BroadcastReceiver
+            stopBroadcastReceiver(receiver)
         }
     }
 
-    private fun stopBroadcastReceiver(broadcastReceiverClass: Class<*>) {
-        val receiver = ComponentName(applicationContext, broadcastReceiverClass)
-
-        val packageManager = applicationContext.packageManager;
-
-        packageManager.setComponentEnabledSetting(receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            PackageManager.DONT_KILL_APP)
+    private fun stopBroadcastReceiver(broadcastReceiver: BroadcastReceiver) {
+        try {
+            applicationContext.unregisterReceiver(broadcastReceiver)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
     }
 
     private fun startService(serviceClass: Class<*>) {
